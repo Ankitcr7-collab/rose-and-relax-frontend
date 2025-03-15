@@ -38,6 +38,7 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
       ...options,
       headers,
       credentials: 'include',
+      mode: 'cors',
     });
 
     console.log(`Response status: ${response.status}`);
@@ -77,6 +78,7 @@ export const api = {
         },
         body: formData.toString(),
         credentials: 'include',
+        mode: 'cors',
       });
       
       console.log(`Login response status: ${response.status}`);
