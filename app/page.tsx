@@ -8,18 +8,18 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-rose-600">Rose & Relax</h1>
+          <h1 className="text-2xl font-bold text-red-600">Rose & Relax</h1>
           <nav className="hidden md:flex space-x-6">
-            <Link href="/" className="text-gray-800 hover:text-rose-600">Home</Link>
-            <Link href="/services" className="text-gray-600 hover:text-rose-600">Services</Link>
-            <Link href="/about" className="text-gray-600 hover:text-rose-600">About</Link>
-            <Link href="/contact" className="text-gray-600 hover:text-rose-600">Contact</Link>
+            <Link href="/" className="text-gray-800 hover:text-red-600">Home</Link>
+            <Link href="/services" className="text-gray-600 hover:text-red-600">Services</Link>
+            <Link href="/about" className="text-gray-600 hover:text-red-600">About</Link>
+            <Link href="/contact" className="text-gray-600 hover:text-red-600">Contact</Link>
           </nav>
           <div className="flex items-center space-x-4">
-            <Link href="/cart" className="text-gray-600 hover:text-rose-600">
+            <Link href="/cart" className="text-gray-600 hover:text-red-600">
               Cart
             </Link>
-            <Link href="/login" className="text-gray-600 hover:text-rose-600">
+            <Link href="/login" className="text-gray-600 hover:text-red-600">
               Login
             </Link>
           </div>
@@ -28,7 +28,7 @@ export default function Home() {
 
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="bg-gradient-to-r from-rose-50 to-rose-100 py-20">
+        <section className="bg-red-50 py-20">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
               Your Ultimate Relaxation Destination
@@ -37,10 +37,10 @@ export default function Home() {
               Experience premium relaxation services tailored just for you. Discover peace and tranquility with Rose & Relax.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="/services" className="bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+              <Link href="/services" className="bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
                 Explore Services
               </Link>
-              <Link href="/contact" className="bg-white hover:bg-gray-100 text-rose-600 font-medium py-3 px-6 rounded-lg border border-rose-200 transition-colors">
+              <Link href="/contact" className="bg-white hover:bg-gray-100 text-red-600 font-medium py-3 px-6 rounded-lg border border-red-200 transition-colors">
                 Contact Us
               </Link>
             </div>
@@ -52,23 +52,23 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-12">Why Choose Us</h2>
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-rose-50 p-6 rounded-lg">
-                <div className="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-rose-600 text-xl">✨</span>
+              <div className="bg-red-50 p-6 rounded-lg">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                  <span className="text-red-600 text-xl">✨</span>
                 </div>
                 <h3 className="text-xl font-semibold mb-2">Premium Experience</h3>
                 <p className="text-gray-600">Enjoy top-tier services with our experienced professionals.</p>
               </div>
-              <div className="bg-rose-50 p-6 rounded-lg">
-                <div className="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-rose-600 text-xl">🌿</span>
+              <div className="bg-red-50 p-6 rounded-lg">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                  <span className="text-red-600 text-xl">🌿</span>
                 </div>
                 <h3 className="text-xl font-semibold mb-2">Natural Products</h3>
                 <p className="text-gray-600">We use only natural, organic products for all our services.</p>
               </div>
-              <div className="bg-rose-50 p-6 rounded-lg">
-                <div className="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-rose-600 text-xl">🛎️</span>
+              <div className="bg-red-50 p-6 rounded-lg">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                  <span className="text-red-600 text-xl">🛎️</span>
                 </div>
                 <h3 className="text-xl font-semibold mb-2">Personalized Care</h3>
                 <p className="text-gray-600">Each service is tailored to meet your specific needs.</p>
