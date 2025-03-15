@@ -1,4 +1,5 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// Use the deployed backend URL directly to ensure it works
+const API_URL = 'https://rose-and-relax-api.onrender.com';
 
 // Helper function to handle API errors
 const handleApiError = (error: any) => {
@@ -58,13 +59,46 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
 
 export const api = {
   // Auth endpoints
-  login: (username: string, password: string) => {
+  login: async (username: string, password: string) => {
     console.log(`Attempting to login with username: ${username}`);
-    return fetchApi('/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`,
-    });
+    
+    // Try a different approach for login
+    try {
+      const formData = new URLSearchParams();
+      formData.append('username', username);
+      formData.append('password', password);
+      
+      console.log("Login request body:", formData.toString());
+      
+      const response = await fetch(`${API_URL}/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData.toString(),
+        credentials: 'include',
+      });
+      
+      console.log(`Login response status: ${response.status}`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Login error response:", errorText);
+        try {
+          const errorJson = JSON.parse(errorText);
+          throw new Error(errorJson.detail || 'Login failed');
+        } catch (e) {
+          throw new Error(`Login failed: ${response.statusText}`);
+        }
+      }
+      
+      const data = await response.json();
+      console.log("Login response data:", data);
+      return data;
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    }
   },
 
   signup: (data: { email: string; username: string; password: string }) => {
