@@ -26,6 +26,7 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   
   const headers = {
     'Content-Type': 'application/json',
+    'Origin': 'https://rose-and-relax-frontend.vercel.app',
     ...(token && { Authorization: `Bearer ${token}` }),
     ...options.headers,
   };
@@ -37,7 +38,6 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     const response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
       headers,
-      credentials: 'include',
       mode: 'cors',
     });
 
@@ -63,8 +63,8 @@ export const api = {
   login: async (username: string, password: string) => {
     console.log(`Attempting to login with username: ${username}`);
     
-    // Try a different approach for login
     try {
+      // Use a simpler approach for login
       const formData = new URLSearchParams();
       formData.append('username', username);
       formData.append('password', password);
@@ -75,9 +75,9 @@ export const api = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
+          'Origin': 'https://rose-and-relax-frontend.vercel.app',
         },
         body: formData.toString(),
-        credentials: 'include',
         mode: 'cors',
       });
       
