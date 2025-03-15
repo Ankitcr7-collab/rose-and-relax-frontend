@@ -1,17 +1,18 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect } from "react"
+import { api } from "@/lib/api"
 
 type User = {
   id: string
-  name: string
+  username: string
   email: string
 } | null
 
 type AuthContextType = {
   user: User
-  login: (email: string, password: string) => Promise<boolean>
-  signup: (name: string, email: string, password: string) => Promise<boolean>
+  login: (usernameOrEmail: string, password: string) => Promise<boolean>
+  signup: (email: string, username: string, password: string) => Promise<boolean>
   logout: () => void
   isLoading: boolean
   error: string | null
@@ -28,66 +29,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Check if user is logged in on initial load
   useEffect(() => {
     setMounted(true)
-    const storedUser = localStorage.getItem("user")
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser))
-      } catch (error) {
-        console.error("Failed to parse user from localStorage", error)
-        localStorage.removeItem("user")
-      }
+    const token = localStorage.getItem("token")
+    
+    if (token) {
+      fetchUserProfile()
+    } else {
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }, [])
 
-  // Mock login function - in a real app, this would call your API
-  const login = async (email: string, password: string) => {
+  // Fetch user profile from API
+  const fetchUserProfile = async () => {
+    try {
+      const userData = await api.getProfile()
+      setUser(userData)
+      setIsLoading(false)
+    } catch (err) {
+      console.error("Failed to fetch user profile", err)
+      localStorage.removeItem("token")
+      setIsLoading(false)
+    }
+  }
+
+  // Real login function that calls the API
+  const login = async (usernameOrEmail: string, password: string) => {
     setIsLoading(true)
     setError(null)
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      const response = await api.login(usernameOrEmail, password)
       
-      // For demo purposes, accept any email/password
-      const mockUser = {
-        id: "user-1",
-        name: email.split('@')[0],
-        email
+      if (response.access_token) {
+        localStorage.setItem("token", response.access_token)
+        await fetchUserProfile()
+        return true
+      } else {
+        throw new Error("No access token received")
       }
-      
-      setUser(mockUser)
-      localStorage.setItem("user", JSON.stringify(mockUser))
-      setIsLoading(false)
-      return true
-    } catch (err) {
-      setError("Login failed. Please check your credentials.")
+    } catch (err: any) {
+      setError(err.message || "Login failed. Please check your credentials.")
       setIsLoading(false)
       return false
     }
   }
 
-  // Mock signup function
-  const signup = async (name: string, email: string, password: string) => {
+  // Real signup function that calls the API
+  const signup = async (email: string, username: string, password: string) => {
     setIsLoading(true)
     setError(null)
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await api.signup({ email, username, password })
       
-      const mockUser = {
-        id: "user-" + Math.floor(Math.random() * 1000),
-        name,
-        email
-      }
-      
-      setUser(mockUser)
-      localStorage.setItem("user", JSON.stringify(mockUser))
-      setIsLoading(false)
-      return true
-    } catch (err) {
-      setError("Signup failed. Please try again.")
+      // After signup, log the user in
+      const loginSuccess = await login(username, password)
+      return loginSuccess
+    } catch (err: any) {
+      setError(err.message || "Signup failed. Please try again.")
       setIsLoading(false)
       return false
     }
@@ -96,7 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Logout function
   const logout = () => {
     setUser(null)
-    localStorage.removeItem("user")
+    localStorage.removeItem("token")
   }
 
   return (

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
+  const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formError, setFormError] = useState("")
@@ -20,13 +20,17 @@ export default function LoginPage() {
     setIsSubmitting(true)
     
     try {
-      const success = await login(email, password)
+      console.log("Attempting login with:", username, password)
+      const success = await login(username, password)
+      console.log("Login result:", success)
+      
       if (success) {
         router.push("/")
       } else {
         setFormError("Login failed. Please check your credentials.")
       }
     } catch (err) {
+      console.error("Login error:", err)
       setFormError("An unexpected error occurred. Please try again.")
     } finally {
       setIsSubmitting(false)
@@ -51,19 +55,19 @@ export default function LoginPage() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4 rounded-md shadow-sm">
             <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
+              <label htmlFor="username" className="sr-only">
+                Username or Email
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="relative block w-full rounded-md border-0 py-2 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-rose-600"
-                placeholder="Email address"
+                placeholder="Username or Email"
               />
             </div>
             <div>
@@ -98,6 +102,10 @@ export default function LoginPage() {
             >
               {isSubmitting ? "Signing in..." : "Sign in"}
             </button>
+          </div>
+          
+          <div className="text-center text-sm text-gray-600">
+            <p>Test account: username: <strong>testuser</strong>, password: <strong>test123</strong></p>
           </div>
         </form>
       </div>
