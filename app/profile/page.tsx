@@ -35,10 +35,10 @@ export default function ProfilePage() {
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <div className="flex items-center mb-6">
             <div className="w-20 h-20 bg-rose-100 rounded-full flex items-center justify-center text-rose-600 text-2xl font-bold mr-4">
-              {user.name.charAt(0).toUpperCase()}
+              {user.username.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h2 className="text-xl font-semibold">{user.name}</h2>
+              <h2 className="text-xl font-semibold">{user.username}</h2>
               <p className="text-gray-600">{user.email}</p>
             </div>
           </div>
@@ -47,8 +47,8 @@ export default function ProfilePage() {
             <h3 className="text-lg font-medium mb-4">Account Information</h3>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-gray-600">Name</span>
-                <span>{user.name}</span>
+                <span className="text-gray-600">Username</span>
+                <span>{user.username}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Email</span>
