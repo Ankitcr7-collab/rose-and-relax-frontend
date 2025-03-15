@@ -1,105 +1,124 @@
-'use client'; // Marks this as a client-side component in Next.js
+"use client"
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import React, { createContext, useContext, useState, useEffect } from "react"
 
-// An interface in TypeScript is like a blueprint or contract that defines the shape of an object
-// This interface says that any User object MUST have these exact properties with these types
-interface User {
-  id: number;          // Must have a numeric id
-  email: string;       // Must have an email that's a string
-  username: string;    // Must have a username that's a string
-  is_active: boolean;  // Must have is_active that's true/false
-  is_admin: boolean;   // Must have is_admin that's true/false
+type User = {
+  id: string
+  name: string
+  email: string
+} | null
+
+type AuthContextType = {
+  user: User
+  login: (email: string, password: string) => Promise<boolean>
+  signup: (name: string, email: string, password: string) => Promise<boolean>
+  logout: () => void
+  isLoading: boolean
+  error: string | null
 }
 
-// This interface defines what methods and properties our authentication system must provide
-// It's like a contract saying "any auth system must have these features"
-interface AuthContextType {
-  user: User | null;   // Must store either a User object or null
-  loading: boolean;    // Must have a loading state (true/false)
-  login: (username: string, password: string) => Promise<void>;  // Must have a login function
-  signup: (email: string, username: string, password: string) => Promise<void>;  // Must have a signup function
-  logout: () => void;  // Must have a logout function
-}
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// Creates a React context with our AuthContextType interface as its shape
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// The main AuthProvider component that wraps our app
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null); // State for current user
-  const [loading, setLoading] = useState(true); // State for loading status
-  const router = useRouter(); // Next.js router for navigation
+  const [user, setUser] = useState<User>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
 
-  // Effect runs on component mount to check if user is already logged in
+  // Check if user is logged in on initial load
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      validateToken();
-    } else {
-      setLoading(false);
+    setMounted(true)
+    const storedUser = localStorage.getItem("user")
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser))
+      } catch (error) {
+        console.error("Failed to parse user from localStorage", error)
+        localStorage.removeItem("user")
+      }
     }
-  }, []);
+    setIsLoading(false)
+  }, [])
 
-  // Validates the JWT token with the backend
-  const validateToken = async () => {
+  // Mock login function - in a real app, this would call your API
+  const login = async (email: string, password: string) => {
+    setIsLoading(true)
+    setError(null)
+    
     try {
-      const userData = await api.getProfile();
-      setUser(userData);
-    } catch (error) {
-      console.error('Token validation error:', error);
-      localStorage.removeItem('token');
-    } finally {
-      setLoading(false);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // For demo purposes, accept any email/password
+      const mockUser = {
+        id: "user-1",
+        name: email.split('@')[0],
+        email
+      }
+      
+      setUser(mockUser)
+      localStorage.setItem("user", JSON.stringify(mockUser))
+      setIsLoading(false)
+      return true
+    } catch (err) {
+      setError("Login failed. Please check your credentials.")
+      setIsLoading(false)
+      return false
     }
-  };
+  }
 
-  // Handles user login
-  const login = async (username: string, password: string) => {
+  // Mock signup function
+  const signup = async (name: string, email: string, password: string) => {
+    setIsLoading(true)
+    setError(null)
+    
     try {
-      const data = await api.login(username, password);
-      localStorage.setItem('token', data.access_token);
-      await validateToken();
-      router.push('/'); // Redirects to home page after login
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      const mockUser = {
+        id: "user-" + Math.floor(Math.random() * 1000),
+        name,
+        email
+      }
+      
+      setUser(mockUser)
+      localStorage.setItem("user", JSON.stringify(mockUser))
+      setIsLoading(false)
+      return true
+    } catch (err) {
+      setError("Signup failed. Please try again.")
+      setIsLoading(false)
+      return false
     }
-  };
+  }
 
-  // Handles user signup
-  const signup = async (email: string, username: string, password: string) => {
-    try {
-      await api.signup({ email, username, password });
-      await login(username, password);
-    } catch (error) {
-      console.error('Signup error:', error);
-      throw error;
-    }
-  };
-
-  // Handles user logout
+  // Logout function
   const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    router.push('/login'); // Redirects to login page
-  };
+    setUser(null)
+    localStorage.removeItem("user")
+  }
 
-  // Provides the authentication context to child components
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        signup,
+        logout,
+        isLoading,
+        error
+      }}
+    >
       {children}
     </AuthContext.Provider>
-  );
+  )
 }
 
-// Custom hook to use the auth context in other components
 export function useAuth() {
-  const context = useContext(AuthContext);
+  const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider")
   }
-  return context;
+  return context
 }

@@ -1,86 +1,76 @@
-'use client';
+"use client"
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/components/auth-provider';
-import ProtectedRoute from '@/components/protected-route';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-
-interface UserProfile {
-  id: number;
-  email: string;
-  username: string;
-  is_active: boolean;
-  is_admin: boolean;
-}
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/components/auth-provider"
 
 export default function ProfilePage() {
-  const { user, logout } = useAuth();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-
+  const { user, logout, isLoading } = useAuth()
+  const router = useRouter()
+  
+  // Redirect to login if not authenticated
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-
-        const response = await fetch('http://localhost:8000/users/me', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setProfile(data);
-        }
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, []);
-
-  if (loading) {
+    if (!isLoading && !user) {
+      router.push("/login")
+    }
+  }, [user, isLoading, router])
+  
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-lg">Loading...</p>
       </div>
-    );
+    )
+  }
+  
+  if (!user) {
+    return null // Will redirect in the useEffect
   }
 
   return (
-    <ProtectedRoute>
-      <div className="container mx-auto px-4 py-8">
-        <Card className="max-w-2xl mx-auto">
-          <CardHeader>
-            <CardTitle>Profile</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Username</label>
-              <p className="text-lg">{profile?.username}</p>
+    <div className="container mx-auto py-10 px-4">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Your Profile</h1>
+        
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="flex items-center mb-6">
+            <div className="w-20 h-20 bg-rose-100 rounded-full flex items-center justify-center text-rose-600 text-2xl font-bold mr-4">
+              {user.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <label className="text-sm font-medium text-muted-foreground">Email</label>
-              <p className="text-lg">{profile?.email}</p>
+              <h2 className="text-xl font-semibold">{user.name}</h2>
+              <p className="text-gray-600">{user.email}</p>
             </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Account Status</label>
-              <p className="text-lg">{profile?.is_active ? 'Active' : 'Inactive'}</p>
+          </div>
+          
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-medium mb-4">Account Information</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Name</span>
+                <span>{user.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Email</span>
+                <span>{user.email}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Member Since</span>
+                <span>March 2023</span>
+              </div>
             </div>
-            <div className="pt-4">
-              <Button onClick={logout} variant="destructive">
-                Logout
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+        
+        <div className="flex justify-end">
+          <button
+            onClick={logout}
+            className="px-4 py-2 bg-rose-600 text-white rounded-md hover:bg-rose-700 transition-colors"
+          >
+            Sign Out
+          </button>
+        </div>
       </div>
-    </ProtectedRoute>
-  );
+    </div>
+  )
 } 
